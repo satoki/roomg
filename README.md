@@ -176,9 +176,8 @@ print("b(^0^b)")
 **zoom_1**  
 部屋部分(顔黒塗り)  
 ![zoom_1_room_60.png](images/zoom_1_room_60.png)  
-パラメータを60とした。  
 ![zoom_1_room_90.png](images/zoom_1_room_90.png)  
-パラメータを90とした。  
 500,500の時間変化  
 ![zoom_1_500_500_check.png](images/zoom_1_500_500_check.png)  
+上の画像をパラメータ60、下の画像をパラメータを90とした。  
 ノイズにより部屋の復元がさらに困難になっていることがわかる。  

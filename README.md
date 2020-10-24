@@ -145,14 +145,14 @@ print("b(^0^b)")
 フレーム数の関係で腕などの表示時間が短いため、背景と判定されている。  
 大幅にバーチャル背景が乱れる現象も復元には大きく影響している。  
 
-## 対抗策
+## 対抗手法
 グリーンバックを使えば部屋の情報が漏れる心配はない。  
 技術的な対策としては、バーチャル背景を不規則に動かすことが挙げられる。  
 規則的に動く場合、バーチャル背景のピクセルが累積してしまうので動画時間によっては復元される恐れがある。  
-バーチャル背景に画像を使用する場合、色と場所をランダムにしたノイズピクセルをばらまくことで機械的な復元を妨げることができる。  
+バーチャル背景の画像を十分長さのある動画とし、色と場所をランダムにしたノイズピクセルをばらまくことで機械的な復元を妨げることができる。  
 
 ### フレーム単位のノイズ
-[手法](#手法)で使用した[sample_01.mp4](tools/sample_01.mp4)をフレーム単位で分割し、1つのフレームのバーチャル背景部分をノイズ[image_123.png](tools/image_123.png)に変更したものを再度動画にした[sample_03.mp4](tools/sample_03.mp4)にroomgを適用する。  
+[手法](#手法)で使用した[sample_01.mp4](tools/sample_01.mp4)をフレーム単位で分割し、1つのフレームのバーチャル背景部分をノイズ[image_123.png](tools/image_123.png)に変更したものを再度動画にした[sample_03.mp4](tools/sample_03.mp4)にRoomgを適用する。  
 フレーム単位で挿入するため、オブジェクトが動いた後の動画後半に挿入した。  
 これは得られた部屋の情報がノイズによってかき消されることを意味している。  
 復元された画像は以下になる。  
@@ -170,7 +170,7 @@ print("b(^0^b)")
 フレーム単位のノイズでは、フレームを削除することにより容易に復元が可能となる。  
 これを防ぐため、バーチャル背景のランダムな箇所へピクセル単位でのノイズを挿入する。  
 ノイズのピクセルサイズをもランダムにすることで予測を困難にすることができるが、動画の質が低下してしまう。  
-本対抗策ではバーチャル背景の認識に影響を与えない程度のノイズを目指し、ノイズの座標と量をランダムに散りばめることとした。  
+本対策ではバーチャル背景の認識に影響を与えない程度のノイズを目指し、ノイズの座標と量をランダムに散りばめることとした。  
 ノイズを含ませたバーチャル背景用動画[noises.mov](tools/noises.mov)をzoomのバーチャル背景として使用した[動画](tools/zoom_1.zip)にRoomgを適用する。  
 動画は[zoom_vbg.png](tools/zoom_vbg.png)より生成したもので、読み込みの関係でmovへの変換を行った。  
 **zoom_1**  
@@ -181,3 +181,143 @@ print("b(^0^b)")
 ![zoom_1_500_500_check.png](images/zoom_1_500_500_check.png)  
 上の画像をパラメータ60、下の画像をパラメータを90とした。  
 ノイズにより部屋の復元がさらに困難になっていることがわかる。  
+
+### コード
+**itonv.py**  
+```python:itonv.py
+import cv2
+import sys
+import copy
+import random
+
+filename = sys.argv[1]
+
+frame = int(input("frame:"))
+fps = float(input("fps:"))
+
+image = cv2.imread(filename)
+h = len(image)
+w = len(image[0])
+
+randlist = []
+for i in range(h):
+    for j in range(w):
+        randlist.append((i,j))
+
+random.shuffle(randlist)
+
+video = cv2.VideoWriter("itonv_{}_{}.mp4".format(filename.replace(".png",""), fps), cv2.VideoWriter_fourcc('m','p','4', 'v'), fps, (w, h))
+
+print("o('x'o)")
+
+##############################
+probability = 100000
+##############################
+
+count = 0
+frame_c = 0
+pixels = h * w #len(randlist)
+image1 = copy.deepcopy(image)
+while True:
+    if count >= pixels - 1:
+        random.shuffle(randlist)
+        count = 0
+    if not random.randrange(probability):
+        if frame_c >= frame:
+            break
+        video.write(image1)
+        frame_c += 1
+        print(frame_c)
+        image1 = copy.deepcopy(image)
+        ##############################
+        no_noises_frames = 5
+        ##############################
+        if frame_c + no_noises_frames>= frame:
+            no_noises_frames = frame - frame_c
+        for i in range(no_noises_frames):
+            video.write(image)
+            frame_c += 1
+            print(frame_c)
+    else:
+        for i in range(3):
+            image1[randlist[count][0]][randlist[count][1]][i] = random.randrange(255)
+        count += 1
+
+video.release()
+
+print("OK")
+```
+
+## ツール群
+使用したツールとその機能および使用方法をまとめる。  
+例として[手法](#手法)で使用した[sample_01.mp4](tools/sample_01.mp4)と[対抗手法](#対抗手法)で使用した[zoom_vbg.png](tools/zoom_vbg.png)を用いる  
+**roomg.py**  
+room + omg  
+バーチャル背景適用済み動画(sample_01.mp4)から部屋の画像()を作成する。  
+[手法](#手法)を実現するツール。  
+パラメータ`omg`により精度が変化する。  
+今後`if abs(sum(most) - sum(least)) > omg:`を改良する必要がある(現状では後ろの時間のピクセルに重みがかかっている)。  
+```bash
+
+```
+**vtois.py**  
+video to images  
+動画(sample_01.mp4)をフレームに分解し、ディレクトリ(sample_01_images)に画像(sample_01_フレーム番号.png)として保存する。  
+```bash
+$ python3 vtois.py sample_01.mp4
+o('3'o)
+f:608
+OK
+```
+**istov.py**  
+images to video  
+複数のフレーム画像を含んだディレクトリ(vtois.pyで分解したものを想定)を選択し、そのフレームから動画(sample_01_istov.mp4)を生成する。  
+```bash
+$ python3 istov.py
+Directory Name:sample_01_images
+h:1080
+w:1920
+fps:60.6
+o('4'o)
+OK
+```
+**randpxs.py**  
+random pixels  
+ノイズフレーム用にノイズで埋め尽くされた画像(image_31415.png)を一枚生成する。  
+seedを選択できる。  
+```bash
+$ python3 randpxs.py
+h:1080
+w:1920
+seed:31415
+o('p'o)
+OK
+```
+**itonv.py**  
+image to noisy video  
+画像(zoom_vbg.png)からピクセルノイズ入りの動画(itonv_zoom_vbg_0.5.mp4)を作成する。  
+[対抗手法](#対抗手法)を実現するツール。  
+`probability = 100000`を減少させ、`no_noises_frames = 5`を増加することでノイズを目立たなくすることができる(同動画長で比較すると復元精度が上がる)。  
+```bash
+$ python3 itonv.py zoom_vbg.png
+frame:5
+fps:0.5
+o('x'o)
+1
+2
+3
+4
+5
+OK
+```
+**xy_check.py**  
+xy check  
+動画(sample_01.mp4)のxとyに指定したピクセル座標の色を時間的に画像(sample_01_200_100_check.png)にまとめる。  
+```bash
+$ python3 xy_check.py sample_01.mp4
+h:200
+w:100
+o('^'o)
+f:608
+OK
+```

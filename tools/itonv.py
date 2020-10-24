@@ -21,7 +21,7 @@ random.shuffle(randlist)
 
 video = cv2.VideoWriter("itonv_{}_{}.mp4".format(filename.replace(".png",""), fps), cv2.VideoWriter_fourcc('m','p','4', 'v'), fps, (w, h))
 
-print("o('4'o)")
+print("o('x'o)")
 
 ##############################
 probability = 100000

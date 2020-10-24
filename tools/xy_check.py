@@ -13,6 +13,8 @@ if not video.isOpened():
 h = int(input("h:")) - 1
 w = int(input("w:")) - 1
 
+print("o('^'o)")
+
 f = 0
 image = []
 
@@ -28,4 +30,5 @@ image = numpy.array([image] * 20)
 print("f:{}".format(f))
 
 cv2.imwrite('{}_{}_{}_check.png'.format(filename.replace(".mp4", ""), h + 1, w + 1), image)
+
 print("OK")

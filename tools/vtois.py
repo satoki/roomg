@@ -25,6 +25,6 @@ while True:
     else:
         break
 
-print("Flame:{}".format(n))
+print("f:{}".format(n))
 
 print("OK")

@@ -3,7 +3,8 @@ Roomgとはバーチャル背景と体などのオブジェクトとの境界の
 **関連記事**  
 [【手動】バーチャル背景が適用された動画から部屋の背景画像を復元する話](https://github.com/satoki/articles/tree/master/【手動】バーチャル背景が適用された動画から部屋の背景画像を復元する話)  
   
-**ソフトウェア開発リポジトリは[こちら](https://github.com/Tsuku43/zoomg)に移行しました**  
+**ここは初期の理論説明ページです**  
+**開発を行う場合は[こちら(Zoomg)](https://github.com/Tsuku43/zoomg)**  
 
 ## 手法
 はじめに理想的な動画を用いての説明を行い、その後に実際の動画に適用する。  
@@ -313,6 +314,7 @@ image to noisy video
 画像(zoom_vbg.png)からピクセルノイズ入りの動画(itonv_zoom_vbg_0.5.mp4)を作成する。  
 [対抗手法](#対抗手法)を実現するツール。  
 `probability = 100000`を減少させ、`no_noises_frames = 5`を増加することでノイズを目立たなくすることができる(同動画長で比較すると復元精度が上がる)。  
+`no_noises_frames = 0`が最良だが、定数の代わりに定数+乱数を用いることで一定周期のノイズフレーム削除による復元を防止できる。  
 ```bash
 $ python3 itonv.py zoom_vbg.png
 frame:5

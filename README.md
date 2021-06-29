@@ -1,4 +1,6 @@
 # Roomg
+[![AVTOKYO](badges/AVTOKYO-2020-black.svg)](https://www.avtokyo.org/2020/) 
+[![ICSS研究賞](badges/ICSS研究賞-2021-f0dc33.svg)](https://www.ieice.org/iss/icss/award.html)  
 Roomgとはバーチャル背景と体などのオブジェクトとの境界の色情報を抽出して、背後に隠れた部屋を自動で復元する技術である。  
 **関連記事**  
 [【手動】バーチャル背景が適用された動画から部屋の背景画像を復元する話](https://github.com/satoki/articles/tree/master/【手動】バーチャル背景が適用された動画から部屋の背景画像を復元する話)  
